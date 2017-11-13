@@ -1,0 +1,38 @@
+<h1>Mastermind</h1>
+<div class="card card-primary col-lg-4">
+        <div class="card-heading">Drag counters</div>
+        <div class="card-body">
+<span *ngFor="let item of src" >
+    <span><img src={{item.filePath}} id={{item.id}} draggable="true" (ondragstart)="onDragStart($event)"></span>
+</span>
+</div>
+</div>
+ <br/>   
+<span *ngFor="let item of target" >
+    <span><img src={{item.filePath}} id={{item.id}} class="dropbox" (onDrop)="onDrop($event)" (ondragover)="onDragOver($event)"></span>
+ </span>
+<br/>
+<br/>
+<div class="table table-striped">
+        <thead>
+    <th>Guess</th>
+    <th><img src="{{greenTick}}"></th>
+    <th><img src="{{amberTick}}"></th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let aguess of prevGuesses">
+                <td *ngFor="let i of aguess.srcIndexes">9</td>
+            </tr>
+        </tbody>
+</div>
+<br/>
+<div *ngIf="gameComplete" >Solution</div>
+ <span *ngFor="let item of solution" >
+    <span><img src="{{item}}" class="dropbox"></span>
+</span>
+
+<br/>
+<div class="panel panel-default">
+    <button class="btn-primary" [disabled]="guessComplete()" (click)="checkGuess($event)">Check
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span></button>
+</div>
