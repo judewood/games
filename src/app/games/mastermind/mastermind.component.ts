@@ -2,6 +2,7 @@ import { Guess } from './dtos/guess';
 import { Component, OnInit, HostListener } from '@angular/core';
 import { Peg } from './dtos/pegs';
 import { SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG } from 'constants';
+import { forEach } from '@angular/router/src/utils/collection';
 
 
 @Component({
@@ -16,7 +17,6 @@ export class MastermindComponent {
     { id: 'target2', filePath: 'assets/images/whitespot.png' },
     { id: 'target3', filePath: 'assets/images/whitespot.png' },
   ];
-  public isDebugging:true;
 
   public src: Peg[] = [
     { id: 'src0', filePath: 'assets/images/redspot.png' },
@@ -37,38 +37,30 @@ export class MastermindComponent {
       srcIndexes: [null, null, null, null],
       redCount: '',
       whiteCount: ''
-    }
-    ;
+    };
 
-  public prevGuesses: Guess[] = [
-    {
-      srcIndexes: [1, 2, 3, 4],
-      redCount: '',
-      whiteCount: ''
-    },
-    {
-      srcIndexes: [5, 6, 7, 0],
-      redCount: '',
-      whiteCount: ''
-    }
-  ];
+  public prevGuesses: Guess[] = [];
   public solution: string[] = [null, null, null, null];
   public sourceIndex: number;
   public solutionLength = 4;
   public thetarget: string;
   public gameComplete = false;
-
+  public playerHasWon = false;
+  public playerHasLost = false;
+  public maxGuesses = 2;
 
   constructor() {
     this.resetGuess();
     this.GenerateSolution();
-
   }
 
   resetGuess() {
     this.guess.srcIndexes = [null, null, null, null];
     this.guess.redCount = '';
     this.guess.whiteCount = '';
+    for (let i = 0; i < this.solutionLength; ++i) {
+      this.target[i].filePath = 'assets/images/whitespot.png';
+    }
   }
 
   @HostListener('dragenter', ['$event'])
@@ -99,9 +91,7 @@ export class MastermindComponent {
   }
 
   public showGuessInConsole(guess: Guess) {
-    console.log('guess:  ' + guess.srcIndexes);
-    console.log('guess red:  ' + guess.redCount);
-    console.log('guess white:  ' + guess.whiteCount);
+    console.log('guess indexes:  ' + guess.srcIndexes + ' red: ' + guess.redCount + ' white: '+ guess.whiteCount);
   }
 
   public GenerateSolution() {
@@ -146,21 +136,49 @@ export class MastermindComponent {
         whiteCount++;
       }
     }
+    if(redCount >= this.solutionLength) {
+      this.playerHasWon = true;
+      this.freezeGame();      
+      return;
+    }
+    if(this.prevGuesses.length >= this.maxGuesses) {
+      this.playerHasLost = true;
+      this.freezeGame();
+      return;
+    }
     this.guess.redCount = redCount.toString();
     this.guess.whiteCount = whiteCount.toString();
-   // this.showGuessInConsole(this.guess);
-   this.updatePreviousGuesses();
+    // this.showGuessInConsole(this.guess);
+    
+    this.updatePreviousGuesses();
     this.resetGuess();
   }
 
   updatePreviousGuesses() {
-    let lastIndex = this.prevGuesses.length - 1;
-    console.log(lastIndex);
-    this.prevGuesses.push(this.guess);
-    lastIndex = this.prevGuesses.length - 1;
-    console.log(lastIndex);
-    console.log(this.prevGuesses[lastIndex].srcIndexes);
-    this.showGuessInConsole(this.prevGuesses[lastIndex]);
+    const guessCopy: Guess = {
+      srcIndexes: [null, null, null, null],
+      redCount: this.guess.redCount,
+      whiteCount: this.guess.whiteCount
+    };
+    for (let i = 0; i < this.solutionLength; ++i) {
+      guessCopy.srcIndexes[i] = this.guess.srcIndexes[i];
+    }
+    this.prevGuesses.push(guessCopy);
+  }
+
+  newGame() {
+    this.prevGuesses = [];
+    this.resetGuess();
+    this.gameComplete = false;
+    this.playerHasWon = false;
+    this.playerHasLost= false;
+    
+  }
+
+  freezeGame () {
+    this.gameComplete = true;
+
   }
 }
+
 
