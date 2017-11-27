@@ -1,24 +1,24 @@
 import { TestBed, async } from '@angular/core/testing';
 
-import { MastermindComponent } from './mastermind.component';
+import { DecoderComponent } from './decoder.component';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MastermindComponent
+        DecoderComponent
       ],
     }).compileComponents();
   }));
 
   it('should create the app', async(() => {
-    const fixture = TestBed.createComponent(MastermindComponent);
+    const fixture = TestBed.createComponent(DecoderComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   }));
 
   it(`should have as title 'app'`, async(() => {
-    const fixture = TestBed.createComponent(MastermindComponent);
+    const fixture = TestBed.createComponent(DecoderComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual('app');
   }));

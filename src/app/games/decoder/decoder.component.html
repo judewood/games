@@ -1,0 +1,88 @@
+<h1>Decoder</h1>
+<div class="row">
+    <div class="well well-lg col-lg-4">
+        <div class=" fa fa-hand-paper-o">
+            <span *ngFor="let item of src">
+                <span>
+                    <img src={{item.filePath}} id={{item.id}} draggable="true" (ondragstart)="onDragStart($event)">
+                </span>
+            </span>
+        </div>
+        <br/>
+        <br/>
+        <div class=" fa fa-hand-o-right">
+            <span *ngFor="let item of target">
+                <span>
+                    <img src={{item.filePath}} id={{item.id}} class="dropbox" (onDrop)="onDrop($event)" (ondragover)="onDragOver($event)">
+                </span>
+            </span>
+            <button class="btn-primary dropbox" [disabled]="guessComplete()" (click)="checkGuess($event)">
+                <span class="fa fa-check-square-o"></span>
+            </button>
+        </div>
+        <br/>
+        <div class=" fa fa-life-ring">
+            <span *ngFor="let item of target">
+                <span>
+                    <button class="btn-primary dropbox fa-question" [disabled]="gameComplete" (click)="cheat(item.id)">
+                    </button>
+                </span>
+            </span>
+        </div>
+        <br/>
+        <br/>
+        <div>
+            <span *ngFor="let item of iconSets">
+                <label>
+                    <input type="radio" value="{{item.value}}" name="iconset">
+                    <img src="{{item.filePath}}">
+                </label>
+            </span>
+        </div>
+        <div *ngIf="gameComplete">
+            <h1 *ngIf="playerHasWon" class="fa fa-smile-o"></h1>
+            <h1 *ngIf="playerHasLost" class="fa fa-frown-o"></h1>
+            <span *ngFor="let item of solution">
+                <span>
+                    <img src="{{item}}" class="dropbox">
+                </span>
+            </span>
+
+        </div>
+        <br/>
+        <br/>
+        <button class="btn-primary" (click)="newGame()">
+            <span class="fa fa-reply"></span>
+        </button>
+    </div>
+    <div class="col-lg-4">
+        <div class="table table-striped">
+            <thead>
+                <th colspan="4">
+                    <span class="fa fa-bars"></span>
+                </th>
+                <th>
+                    <img src="{{greenTick}}">
+                </th>
+                <th>
+                    <img src="{{amberTick}}">
+                </th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let aguess of prevGuesses">
+                    <td *ngFor="let i of aguess.srcIndexes">
+                        <img src="{{src[i].filePath}}">
+                    </td>
+                    <td>{{aguess.redCount}}</td>
+                    <td>{{aguess.whiteCount}}</td>
+                </tr>
+            </tbody>
+        </div>
+    </div>
+</div>
+<br/>
+<div>Icons made by
+    <a href="http://www.freepik.com" title="Freepik">Freepik</a> from
+    <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by
+    <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+</div>

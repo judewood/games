@@ -3,63 +3,96 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { Peg } from './dtos/pegs';
 import { SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG } from 'constants';
 import { forEach } from '@angular/router/src/utils/collection';
+import { IconSet } from './dtos/iconSet';
 
 
 @Component({
-  selector: 'app-mastermind',
-  templateUrl: './mastermind.component.html',
-  styleUrls: ['./mastermind.component.css']
+  selector: 'app-decoder',
+  templateUrl: './decoder.component.html',
+  styleUrls: ['./decoder.component.css']
 })
-export class MastermindComponent {
-  public target: Peg[] = [
-    { id: 'target0', filePath: 'assets/images/whitespot.png' },
-    { id: 'target1', filePath: 'assets/images/whitespot.png' },
-    { id: 'target2', filePath: 'assets/images/whitespot.png' },
-    { id: 'target3', filePath: 'assets/images/whitespot.png' },
-  ];
-
-  public src: Peg[] = [
-    { id: 'src0', filePath: 'assets/images/redspot.png' },
-    { id: 'src1', filePath: 'assets/images/greenspot.png' },
-    { id: 'src2', filePath: 'assets/images/bluespot.png' },
-    { id: 'src3', filePath: 'assets/images/greyspot.png' },
-    { id: 'src4', filePath: 'assets/images/yellowspot.png' },
-    { id: 'src5', filePath: 'assets/images/blackspot.png' },
-    { id: 'src6', filePath: 'assets/images/purplespot.png' },
-    { id: 'src7', filePath: 'assets/images/orangespot.png' },
-  ];
+export class DecoderComponent {
+  public target: Peg[] = [];
+  public src: Peg[] = [];
 
   public greenTick = 'assets/images/greentick.png';
   public amberTick = 'assets/images/ambertick.png';
 
-  public guess: Guess =
-    {
-      srcIndexes: [null, null, null, null],
-      redCount: '',
-      whiteCount: ''
-    };
-
+  public guess: Guess;
   public prevGuesses: Guess[] = [];
-  public solution: string[] = [null, null, null, null];
-  public sourceIndex: number;
+  public solution: string[];
   public solutionLength = 4;
   public thetarget: string;
-  public gameComplete = false;
+  public gameComplete;
   public playerHasWon = false;
   public playerHasLost = false;
-  public maxGuesses = 2;
+  public maxGuesses = 10;
+  public sourceLength = 8;
+  public iconSets: IconSet[];
+  public iconSet: IconSet;
 
   constructor() {
-    this.resetGuess();
-    this.GenerateSolution();
+    this.populateIconConfig();
+    this.newGame();
+  }
+
+  populateIconConfig() {
+    this.iconSets = [
+      {
+        value: 'emoticons',
+        filePath: 'assets/images/emoticons/src0.png'
+      },
+      {
+        value: 'xmas',
+        filePath: 'assets/images/xmas/src0.png'
+      },
+      {
+        value: 'flags',
+        filePath: 'assets/images/flags/src0.png'
+      }
+    ];
+  }
+  resetSource() {
+    this.src = [];
+    for (let i = 0; i < this.sourceLength; ++i) {
+      let peg: Peg = {
+        id: 'src' + i.toString(),
+        filePath: 'assets/images/emoticons/src' + i.toString() + '.png'
+      }
+      this.src.push(peg);
+    }
+  }
+
+  cheat(itemId: string) {
+    let targetIndex: number = this.getTargetIndex(itemId);
+    for (let i = 0; i < this.sourceLength; ++i) {
+      if (this.src[i].filePath === this.solution[targetIndex]) {
+        this.target[targetIndex].filePath = this.src[i].filePath;
+        this.guess.srcIndexes[targetIndex] = i;
+        break;
+      }
+    }
+  }
+
+  resetTarget() {
+    this.target = [];
+    for (let i = 0; i < this.solutionLength; ++i) {
+      let peg: Peg = {
+        id: 'target' + i.toString(),
+        filePath: 'assets/images/whitespot.png'
+      };
+      this.target.push(peg);
+    }
   }
 
   resetGuess() {
-    this.guess.srcIndexes = [null, null, null, null];
-    this.guess.redCount = '';
-    this.guess.whiteCount = '';
+    this.guess = {
+      srcIndexes: [],
+      redCount: '',
+      whiteCount: ''
+    };
     for (let i = 0; i < this.solutionLength; ++i) {
-      this.target[i].filePath = 'assets/images/whitespot.png';
+      this.guess.srcIndexes[i] = null;
     }
   }
 
@@ -91,10 +124,14 @@ export class MastermindComponent {
   }
 
   public showGuessInConsole(guess: Guess) {
-    console.log('guess indexes:  ' + guess.srcIndexes + ' red: ' + guess.redCount + ' white: '+ guess.whiteCount);
+    console.log('guess indexes:  ' + guess.srcIndexes + ' red: ' + guess.redCount + ' white: ' + guess.whiteCount);
   }
 
   public GenerateSolution() {
+    this.solution = [];
+    for (let i = 0; i < this.solutionLength; ++i) {
+      this.solution.push('');
+    }
     for (let i = 0; i < this.solutionLength; ++i) {
       let isDuplicate = true;
       while (isDuplicate) {
@@ -113,7 +150,6 @@ export class MastermindComponent {
 
   duplicateDetected(srcIndex: number): boolean {
     if (this.guess.srcIndexes.indexOf(srcIndex) >= 0) {
-      console.log('duplicate: ' + this.guess.srcIndexes.indexOf(srcIndex));
       return true;
     }
     return false;
@@ -123,12 +159,15 @@ export class MastermindComponent {
     return (Number(id.substring(3)));
   }
 
+  getTargetIndex(id: string): number {
+    return (Number(id.substring(6)));
+  }
+
   checkGuess(envent) {
     let redCount = 0;
     let whiteCount = 0;
 
     for (let i = 0; i < this.solutionLength; ++i) {
-
       const filePathTocheck = this.src[this.guess.srcIndexes[i]].filePath;
       if (filePathTocheck === this.solution[i]) {
         redCount++;
@@ -136,21 +175,21 @@ export class MastermindComponent {
         whiteCount++;
       }
     }
-    if(redCount >= this.solutionLength) {
+    this.guess.redCount = redCount.toString();
+    this.guess.whiteCount = whiteCount.toString();
+    this.updatePreviousGuesses();
+    if (redCount >= this.solutionLength) {
       this.playerHasWon = true;
-      this.freezeGame();      
+      this.freezeGame();
       return;
     }
-    if(this.prevGuesses.length >= this.maxGuesses) {
+    if (this.prevGuesses.length >= this.maxGuesses) {
       this.playerHasLost = true;
       this.freezeGame();
       return;
     }
-    this.guess.redCount = redCount.toString();
-    this.guess.whiteCount = whiteCount.toString();
-    // this.showGuessInConsole(this.guess);
-    
-    this.updatePreviousGuesses();
+
+    this.resetTarget();
     this.resetGuess();
   }
 
@@ -163,21 +202,22 @@ export class MastermindComponent {
     for (let i = 0; i < this.solutionLength; ++i) {
       guessCopy.srcIndexes[i] = this.guess.srcIndexes[i];
     }
-    this.prevGuesses.push(guessCopy);
+    this.prevGuesses.unshift(guessCopy);
   }
 
   newGame() {
     this.prevGuesses = [];
+    this.resetSource();
+    this.resetTarget();
     this.resetGuess();
+    this.GenerateSolution();
     this.gameComplete = false;
     this.playerHasWon = false;
-    this.playerHasLost= false;
-    
+    this.playerHasLost = false;
   }
 
-  freezeGame () {
+  freezeGame() {
     this.gameComplete = true;
-
   }
 }
 
