@@ -29,8 +29,7 @@ export class DecoderComponent {
   public maxGuesses = 10;
   public sourceLength = 8;
   public iconSets: IconSet[];
-  public iconSet: IconSet;
-  
+  public iconSetDirectory = 'emoticons';
 
   constructor() {
     this.populateIconConfig();
@@ -54,11 +53,12 @@ export class DecoderComponent {
     ];
   }
   resetSource() {
+    let basePath = 'assets/images/' + this.iconSetDirectory +  '/src';
     this.src = [];
     for (let i = 0; i < this.sourceLength; ++i) {
       let peg: Peg = {
         id: 'src' + i.toString(),
-        filePath: 'assets/images/emoticons/src' + i.toString() + '.png'
+        filePath: basePath + i.toString() + '.png'
       }
       this.src.push(peg);
     }
@@ -86,7 +86,7 @@ export class DecoderComponent {
     }
   }
 
-  public getBlankImage() : string {
+  public getBlankImage(): string {
     return 'assets/images/whitespot.png'
   }
 
@@ -119,8 +119,8 @@ export class DecoderComponent {
     this.updateGuess(srcId, targetIndex);
   }
 
-  public updateGuess(srcId:string, targetIndex: number) {
-    
+  public updateGuess(srcId: string, targetIndex: number) {
+
     const srcIndex = this.getSrcIndex(srcId);
     if (this.duplicateDetected(srcIndex)) { return; }
     this.target[targetIndex].filePath = this.src[srcIndex].filePath;
@@ -134,27 +134,23 @@ export class DecoderComponent {
     return false;
   }
 
-  public srcImageClicked(srcId:string) {
-    if(this.gameComplete) { return;}
+  public srcImageClicked(srcId: string) {
+    if (this.gameComplete) { return; }
     let targetIndex = this.guess.srcIndexes.indexOf(null);
-    if(targetIndex > -1) {
+    if (targetIndex > -1) {
       this.updateGuess(srcId, targetIndex);
     }
   }
 
-  public targetImageClicked(targetId:string) {
-    if(this.gameComplete) { return;}
+  public targetImageClicked(targetId: string) {
+    if (this.gameComplete) { return; }
     let targetIndex = this.getTargetIndex(targetId);
-this.guess.srcIndexes[targetIndex] = null;
-this.target[targetIndex].filePath = this.getBlankImage();
+    this.guess.srcIndexes[targetIndex] = null;
+    this.target[targetIndex].filePath = this.getBlankImage();
   }
 
   public showPrevGuesses(): boolean {
     return this.prevGuesses != null && this.prevGuesses != undefined && this.prevGuesses.length > 0;
-  }
-
-  public showGuessInConsole(guess: Guess) {
-    console.log('guess indexes:  ' + guess.srcIndexes + ' red: ' + guess.redCount + ' white: ' + guess.whiteCount);
   }
 
   public GenerateSolution() {
@@ -219,6 +215,13 @@ this.target[targetIndex].filePath = this.getBlankImage();
     this.resetGuess();
   }
 
+  public changeIconSet(item: IconSet) {
+    if(item.value === this.iconSetDirectory)  {
+      return;
+    }
+    this.iconSetDirectory = item.value;
+    this.newGame();
+  }
   updatePreviousGuesses() {
     const guessCopy: Guess = {
       srcIndexes: [null, null, null, null],
