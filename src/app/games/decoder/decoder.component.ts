@@ -30,6 +30,7 @@ export class DecoderComponent {
   public sourceLength = 8;
   public iconSets: IconSet[];
   public iconSet: IconSet;
+  
 
   constructor() {
     this.populateIconConfig();
@@ -79,10 +80,14 @@ export class DecoderComponent {
     for (let i = 0; i < this.solutionLength; ++i) {
       let peg: Peg = {
         id: 'target' + i.toString(),
-        filePath: 'assets/images/whitespot.png'
+        filePath: this.getBlankImage()
       };
       this.target.push(peg);
     }
+  }
+
+  public getBlankImage() : string {
+    return 'assets/images/whitespot.png'
   }
 
   resetGuess() {
@@ -109,11 +114,17 @@ export class DecoderComponent {
 
     event.preventDefault();
     event.stopPropagation();
+    let srcId = event.srcElement.id;
     const targetIndex = Number(this.thetarget.substring(6));
-    const srcIndex = this.getSrcIndex(event.srcElement.id);
+    this.updateGuess(srcId, targetIndex);
+  }
+
+  public updateGuess(srcId:string, targetIndex: number) {
+    
+    const srcIndex = this.getSrcIndex(srcId);
     if (this.duplicateDetected(srcIndex)) { return; }
     this.target[targetIndex].filePath = this.src[srcIndex].filePath;
-    this.updateGuess(srcIndex, targetIndex);
+    this.guess.srcIndexes[targetIndex] = srcIndex;
   }
 
   public guessComplete(): boolean {
@@ -121,6 +132,25 @@ export class DecoderComponent {
       return true;
     }
     return false;
+  }
+
+  public srcImageClicked(srcId:string) {
+    if(this.gameComplete) { return;}
+    let targetIndex = this.guess.srcIndexes.indexOf(null);
+    if(targetIndex > -1) {
+      this.updateGuess(srcId, targetIndex);
+    }
+  }
+
+  public targetImageClicked(targetId:string) {
+    if(this.gameComplete) { return;}
+    let targetIndex = this.getTargetIndex(targetId);
+this.guess.srcIndexes[targetIndex] = null;
+this.target[targetIndex].filePath = this.getBlankImage();
+  }
+
+  public showPrevGuesses(): boolean {
+    return this.prevGuesses != null && this.prevGuesses != undefined && this.prevGuesses.length > 0;
   }
 
   public showGuessInConsole(guess: Guess) {
@@ -142,10 +172,6 @@ export class DecoderComponent {
         }
       }
     }
-  }
-
-  updateGuess(srcIndex: number, targetIndex: number) {
-    this.guess.srcIndexes[targetIndex] = srcIndex;
   }
 
   duplicateDetected(srcIndex: number): boolean {

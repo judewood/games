@@ -4,7 +4,7 @@
         <div class=" fa fa-hand-paper-o">
             <span *ngFor="let item of src">
                 <span>
-                    <img src={{item.filePath}} id={{item.id}} draggable="true" (ondragstart)="onDragStart($event)">
+                    <img src={{item.filePath}} id={{item.id}} [draggable]="!gameComplete" (click)="srcImageClicked(item.id)" (ondragstart)="onDragStart($event)">
                 </span>
             </span>
         </div>
@@ -13,7 +13,7 @@
         <div class=" fa fa-hand-o-right">
             <span *ngFor="let item of target">
                 <span>
-                    <img src={{item.filePath}} id={{item.id}} class="dropbox" (onDrop)="onDrop($event)" (ondragover)="onDragOver($event)">
+                    <img src={{item.filePath}} id={{item.id}} class="dropbox" draggable="false" (click)="targetImageClicked(item.id)" (onDrop)="onDrop($event)" (ondragover)="onDragOver($event)">
                 </span>
             </span>
             <button class="btn-primary dropbox" [disabled]="guessComplete()" (click)="checkGuess($event)">
@@ -31,6 +31,16 @@
         </div>
         <br/>
         <br/>
+        <div *ngIf="gameComplete">
+            <h1 *ngIf="playerHasWon" class="fa fa-smile-o"></h1>
+            <h1 *ngIf="playerHasLost" class="fa fa-frown-o"></h1>
+            <span *ngFor="let item of solution">
+                <span>
+                    <img src="{{item}}" class="dropbox" [draggable]="false">
+                </span>
+            </span>
+
+        </div>
         <div>
             <span *ngFor="let item of iconSets">
                 <label>
@@ -39,16 +49,6 @@
                 </label>
             </span>
         </div>
-        <div *ngIf="gameComplete">
-            <h1 *ngIf="playerHasWon" class="fa fa-smile-o"></h1>
-            <h1 *ngIf="playerHasLost" class="fa fa-frown-o"></h1>
-            <span *ngFor="let item of solution">
-                <span>
-                    <img src="{{item}}" class="dropbox">
-                </span>
-            </span>
-
-        </div>
         <br/>
         <br/>
         <button class="btn-primary" (click)="newGame()">
@@ -56,7 +56,7 @@
         </button>
     </div>
     <div class="col-lg-4">
-        <div class="table table-striped">
+        <div *ngIf="showPrevGuesses()"class="table table-striped">
             <thead>
                 <th colspan="4">
                     <span class="fa fa-bars"></span>
