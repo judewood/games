@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { JigsawComponent } from './jigsaw/jigsaw.component';
-import { MastermindComponent } from './mastermind/mastermind.component';
+import { DecoderComponent } from './decoder/decoder.component';
 import { NgModule } from '@angular/core';
 
 @NgModule({
     declarations: [
-        MastermindComponent,
+        DecoderComponent,
         JigsawComponent],
         imports: [  CommonModule ]
 })
