@@ -49,6 +49,10 @@ export class DecoderComponent {
       {
         value: 'flags',
         filePath: 'assets/images/flags/src0.png'
+      },
+      {
+        value: 'food',
+        filePath: 'assets/images/food/src0.png'
       }
     ];
   }
