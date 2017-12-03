@@ -47,8 +47,16 @@ export class DecoderComponent {
         filePath: 'assets/images/xmas/src0.png'
       },
       {
+        value: 'animals',
+        filePath: 'assets/images/animals/src0.png'
+      },
+      {
         value: 'flags',
         filePath: 'assets/images/flags/src0.png'
+      },
+      {
+        value: 'food',
+        filePath: 'assets/images/food/src0.png'
       }
     ];
   }
@@ -78,7 +86,7 @@ export class DecoderComponent {
   resetTarget() {
     this.target = [];
     for (let i = 0; i < this.solutionLength; ++i) {
-      let peg: Peg = {
+      const peg: Peg = {
         id: 'target' + i.toString(),
         filePath: this.getBlankImage()
       };
@@ -87,7 +95,7 @@ export class DecoderComponent {
   }
 
   public getBlankImage(): string {
-    return 'assets/images/whitespot.png'
+    return 'assets/images/whitespot.png';
   }
 
   resetGuess() {
@@ -114,7 +122,7 @@ export class DecoderComponent {
 
     event.preventDefault();
     event.stopPropagation();
-    let srcId = event.srcElement.id;
+    const srcId = event.srcElement.id;
     const targetIndex = Number(this.thetarget.substring(6));
     this.updateGuess(srcId, targetIndex);
   }
@@ -136,7 +144,7 @@ export class DecoderComponent {
 
   public srcImageClicked(srcId: string) {
     if (this.gameComplete) { return; }
-    let targetIndex = this.guess.srcIndexes.indexOf(null);
+    const targetIndex = this.guess.srcIndexes.indexOf(null);
     if (targetIndex > -1) {
       this.updateGuess(srcId, targetIndex);
     }
